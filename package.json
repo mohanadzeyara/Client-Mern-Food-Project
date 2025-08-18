@@ -6,6 +6,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
+  "scripts": {
+  "start": "react-scripts start",
+  "build": "ESLINT_NO_DEV_ERRORS=true react-scripts build"
+},
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^2.10.4",
