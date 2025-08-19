@@ -20,7 +20,7 @@ export default function RecipeDetail() {
 
   return (
     <Box bg="white" p={6} borderRadius="2xl" boxShadow="sm">
-      {rec.image && <Image src={(process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/images/' + rec.image} alt={rec.title} mb={4} borderRadius="xl" />}
+      {rec.image && <Image src={("https://mern-project-server-ivsc.onrender.com" || 'http://localhost:5000') + '/images/' + rec.image} alt={rec.title} mb={4} borderRadius="xl" />}
       <Heading mb={2}>{rec.title}</Heading>
       <Text color="gray.600" mb={4}>By {rec.author?.name || 'Unknown'}</Text>
       <Text mb={4}>{rec.description}</Text>
