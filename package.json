@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build"}  
-},
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^2.10.4",
