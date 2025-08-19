@@ -34,8 +34,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "eslint-plugin-react-hooks": "^5.2.0"
-  }
+  "description": ""
 }
