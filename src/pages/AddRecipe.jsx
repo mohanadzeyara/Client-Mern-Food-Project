@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Box, Button, Heading, Input, Stack, FormControl, FormLabel, Textarea, Alert, AlertIcon } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../utils/api'; // <-- use your centralized axios instance
 
 export default function AddRecipe() {
-  const { api } = useAuth();
+  const { token } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
@@ -20,14 +21,21 @@ export default function AddRecipe() {
       setError('Please fill in all fields');
       return;
     }
+
     const fd = new FormData();
     fd.append('title', title);
     fd.append('description', description);
     fd.append('ingredients', ingredients);
     fd.append('steps', steps);
     if (image) fd.append('image', image);
+
     try {
-      const { data } = await api.post('/recipes', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const { data } = await api.post('/recipes', fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
       navigate('/recipe/' + data._id);
     } catch (e) {
       setError(e?.response?.data?.error || 'Failed to create recipe');

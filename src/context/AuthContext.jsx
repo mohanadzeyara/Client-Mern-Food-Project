@@ -11,8 +11,11 @@ export function AuthProvider({ children }) {
   });
   const [loading, setLoading] = useState(true);
 
+  // Use VITE_API_URL (for Vercel) or fallback to localhost
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+    baseURL: API_URL,
     headers: token ? { Authorization: `Bearer ${token}` } : {}
   });
 
@@ -50,12 +53,12 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
-    const { data } = await axios.post((process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/auth/login', { email, password });
+    const { data } = await axios.post(`${API_URL}/auth/login`, { email, password });
     saveSession(data.token, data.user);
   }
 
   async function register(name, email, password) {
-    const { data } = await axios.post((process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/auth/register', { name, email, password });
+    const { data } = await axios.post(`${API_URL}/auth/register`, { name, email, password });
     saveSession(data.token, data.user);
   }
 

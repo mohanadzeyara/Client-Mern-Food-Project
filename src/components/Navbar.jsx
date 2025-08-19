@@ -11,6 +11,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   // Keep search input in sync with URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);

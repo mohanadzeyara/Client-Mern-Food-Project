@@ -4,10 +4,30 @@ import { Box, Heading, Text, Button, Image, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
 export default function RecipeCard({ recipe, canEdit, onDelete }) {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   return (
-    <Box as={motion.div} whileHover={{ y: -4, boxShadow: 'lg' }} transition={{ type: 'spring', stiffness: 300 }} borderWidth="1px" borderRadius="2xl" overflow="hidden" p={4} bg="white" boxShadow="sm">
+    <Box
+      as={motion.div}
+      whileHover={{ y: -4, boxShadow: 'lg' }}
+      transition={{ type: 'spring', stiffness: 300 }}
+      borderWidth="1px"
+      borderRadius="2xl"
+      overflow="hidden"
+      p={4}
+      bg="white"
+      boxShadow="sm"
+    >
       {recipe.image && (
-        <Image src={(process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/images/' + recipe.image} alt={recipe.title} w="100%" h="200px" objectFit="cover" borderRadius="xl" mb={3} />
+        <Image
+          src={`${API_URL}/images/${recipe.image}`}
+          alt={recipe.title}
+          w="100%"
+          h="200px"
+          objectFit="cover"
+          borderRadius="xl"
+          mb={3}
+        />
       )}
       <Heading size="md" mb={2}>{recipe.title}</Heading>
       <Text noOfLines={2} color="gray.600" mb={4}>{recipe.description}</Text>

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, Heading, Input, Stack, FormControl, FormLabel, Textarea, Alert, AlertIcon } from '@chakra-ui/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../utils/api'; // centralized axios instance
 
 export default function EditRecipe() {
   const { id } = useParams();
-  const { api } = useAuth();
+  const { token } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
@@ -16,28 +17,41 @@ export default function EditRecipe() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await api.get('/recipes/' + id);
-      setTitle(data.title);
-      setDescription(data.description);
-      setIngredients(data.ingredients.join('\n'));
-      setSteps(data.steps.join('\n'));
+      try {
+        const { data } = await api.get(`/recipes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setTitle(data.title);
+        setDescription(data.description);
+        setIngredients(data.ingredients.join('\n'));
+        setSteps(data.steps.join('\n'));
+      } catch (err) {
+        setError(err?.response?.data?.error || 'Failed to fetch recipe');
+      }
     })();
-  }, [id]);
+  }, [id, token]);
 
   const submit = async (e) => {
     e.preventDefault();
     setError('');
+
     const fd = new FormData();
     fd.append('title', title);
     fd.append('description', description);
     fd.append('ingredients', ingredients);
     fd.append('steps', steps);
     if (image) fd.append('image', image);
+
     try {
-      const { data } = await api.put('/recipes/' + id, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const { data } = await api.put(`/recipes/${id}`, fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        },
+      });
       navigate('/recipe/' + data._id);
-    } catch (e) {
-      setError(e?.response?.data?.error || 'Failed to update recipe');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Failed to update recipe');
     }
   };
 
