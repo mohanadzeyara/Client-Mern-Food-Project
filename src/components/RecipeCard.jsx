@@ -4,7 +4,7 @@ import { Box, Heading, Text, Button, Image, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
 export default function RecipeCard({ recipe, canEdit, onDelete }) {
-  const API_URL = "https://mern-project-server-ivsc.onrender.com" || 'http://localhost:5000';
+  const API_URL =  'http://localhost:5000';
 
   return (
     <Box
