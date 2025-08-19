@@ -6,7 +6,7 @@ export default function Footer() {
     <Box as="footer" bg="gray.50" borderTop="1px solid #eee" py={4} textAlign="center">
       <Text fontSize="sm" color="gray.600">
         &copy; {new Date().getFullYear()} Mohanad Zeyara - MERN Food App.{' '}
-        <Link href="https://github.com/yourusername" color="teal.500" isExternal>
+        <Link href="https://github.com/mohanadzeyara" color="teal.500" isExternal>
           GitHub
         </Link>
       </Text>
