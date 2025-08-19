@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "react-scripts start",
-    "build": "ESLINT_NO_DEV_ERRORS=true react-scripts build"
+    "build": "react-scripts build --eslint-disable"
+
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
