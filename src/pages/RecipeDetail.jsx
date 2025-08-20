@@ -20,7 +20,14 @@ export default function RecipeDetail() {
 
   return (
     <Box bg="white" p={6} borderRadius="2xl" boxShadow="sm">
-      {rec.image && <Image src={("https://mern-project-server-ivsc.onrender.com" || 'http://localhost:5000') + '/images/' + rec.image} alt={rec.title} mb={4} borderRadius="xl" />}
+      {rec.image && (
+        <Image
+          src={rec.image}   // ✅ Direct Cloudinary URL
+          alt={rec.title}
+          mb={4}
+          borderRadius="xl"
+        />
+      )}
       <Heading mb={2}>{rec.title}</Heading>
       <Text color="gray.600" mb={4}>By {rec.author?.name || 'Unknown'}</Text>
       <Text mb={4}>{rec.description}</Text>
@@ -34,7 +41,7 @@ export default function RecipeDetail() {
         <Box flex="1">
           <Heading size="md" mb={2}>Steps</Heading>
           <List spacing={1}>
-            {rec.steps.map((s, idx) => <ListItem key={idx}>{idx+1}. {s}</ListItem>)}
+            {rec.steps.map((s, idx) => <ListItem key={idx}>{idx + 1}. {s}</ListItem>)}
           </List>
         </Box>
       </Stack>

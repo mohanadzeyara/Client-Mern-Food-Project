@@ -1,64 +1,61 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import API_URL from '../utils/api';
 
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
-  const [user, setUser] = useState(() => {
+  const [user, setUser]   = useState(() => {
     const raw = localStorage.getItem('user');
     return raw ? JSON.parse(raw) : null;
   });
   const [loading, setLoading] = useState(true);
 
-  // Use VITE_API_URL (for Vercel) or fallback to localhost
-  const API_URL = "https://mern-project-server-ivsc.onrender.com" || 'http://localhost:5000';
+  const api = axios.create({ baseURL: API_URL });
 
-  const api = axios.create({
-    baseURL: API_URL,
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  // Attach token for every request
+  api.interceptors.request.use(config => {
+    const t = localStorage.getItem('token');
+    if (t) config.headers.Authorization = `Bearer ${t}`;
+    return config;
   });
 
   useEffect(() => {
-    async function load() {
+    async function boot() {
       try {
-        if (token) {
-          const { data } = await api.get('/auth/me');
-          setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
-        }
-      } catch (e) {
-        console.error(e);
+        if (!token) return;
+        const { data } = await api.get('/auth/me');
+        setUser(data);
+      } catch {
         logout();
       } finally {
         setLoading(false);
       }
     }
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+    boot();
+  }, []); // once
 
-  function saveSession(tok, usr) {
-    setToken(tok);
-    setUser(usr);
-    localStorage.setItem('token', tok);
+  function saveSession(tk, usr) {
+    localStorage.setItem('token', tk);
     localStorage.setItem('user', JSON.stringify(usr));
+    setToken(tk);
+    setUser(usr);
   }
 
   function logout() {
-    setToken(null);
-    setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setToken(null);
+    setUser(null);
   }
 
   async function login(email, password) {
-    const { data } = await axios.post(`${API_URL}/auth/login`, { email, password });
+    const { data } = await api.post('/auth/login', { email, password });
     saveSession(data.token, data.user);
   }
-
   async function register(name, email, password) {
-    const { data } = await axios.post(`${API_URL}/auth/register`, { name, email, password });
+    const { data } = await api.post('/auth/register', { name, email, password });
     saveSession(data.token, data.user);
   }
 

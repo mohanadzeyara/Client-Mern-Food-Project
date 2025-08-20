@@ -1,53 +1,35 @@
 import React, { useState } from 'react';
-import { Box, Button, Heading, Input, Stack, FormControl, FormLabel, Textarea, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Textarea, Heading, VStack } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api'; // <-- use your centralized axios instance
 
 export default function AddRecipe() {
-  const { token } = useAuth();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [ingredients, setIngredients] = useState('');
-  const [steps, setSteps] = useState('');
-  const [image, setImage] = useState(null);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { api } = useAuth();
 
-  const submit = async (e) => {
+  const [title, setTitle]             = useState('');
+  const [description, setDescription] = useState('');
+  const [ingredients, setIngredients] = useState(''); // newline-separated
+  const [steps, setSteps]             = useState(''); // newline-separated
+  const [image, setImage]             = useState(null);
+
+  async function onSubmit(e) {
     e.preventDefault();
-    setError('');
-    if (!title || !description || !ingredients || !steps) {
-      setError('Please fill in all fields');
-      return;
-    }
-
     const fd = new FormData();
     fd.append('title', title);
     fd.append('description', description);
-    fd.append('ingredients', ingredients);
-    fd.append('steps', steps);
+    fd.append('ingredients', JSON.stringify(ingredients.split('\n').map(s => s.trim()).filter(Boolean)));
+    fd.append('steps', JSON.stringify(steps.split('\n').map(s => s.trim()).filter(Boolean)));
     if (image) fd.append('image', image);
-
-    try {
-      const { data } = await api.post('/recipes', fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      navigate('/recipe/' + data._id);
-    } catch (e) {
-      setError(e?.response?.data?.error || 'Failed to create recipe');
-    }
-  };
+    await api.post('/recipes', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    navigate('/');
+  }
 
   return (
-    <Box maxW="lg" mx="auto" bg="white" p={6} borderRadius="2xl" boxShadow="md">
-      <Heading mb={4}>Add Recipe</Heading>
-      {error && <Alert status="error" mb={3}><AlertIcon />{error}</Alert>}
-      <form onSubmit={submit}>
-        <Stack spacing={3}>
+    <Box maxW="700px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="xl">
+      <Heading mb={4}>Create Recipe</Heading>
+      <form onSubmit={onSubmit}>
+        <VStack spacing={4} align="stretch">
           <FormControl isRequired>
             <FormLabel>Title</FormLabel>
             <Input value={title} onChange={e => setTitle(e.target.value)} />
@@ -69,7 +51,7 @@ export default function AddRecipe() {
             <Input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
           </FormControl>
           <Button type="submit" colorScheme="teal">Create</Button>
-        </Stack>
+        </VStack>
       </form>
     </Box>
   );

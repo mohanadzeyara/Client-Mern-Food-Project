@@ -1,66 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Heading, Input, Stack, FormControl, FormLabel, Textarea, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Textarea, Heading, VStack } from '@chakra-ui/react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api'; // centralized axios instance
 
 export default function EditRecipe() {
   const { id } = useParams();
-  const { token } = useAuth();
-  const [title, setTitle] = useState('');
+  const navigate = useNavigate();
+  const { api } = useAuth();
+
+  const [title, setTitle]             = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
-  const [steps, setSteps] = useState('');
-  const [image, setImage] = useState(null);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [steps, setSteps]             = useState('');
+  const [image, setImage]             = useState(null);
 
   useEffect(() => {
     (async () => {
-      try {
-        const { data } = await api.get(`/recipes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setTitle(data.title);
-        setDescription(data.description);
-        setIngredients(data.ingredients.join('\n'));
-        setSteps(data.steps.join('\n'));
-      } catch (err) {
-        setError(err?.response?.data?.error || 'Failed to fetch recipe');
-      }
+      const { data } = await api.get(`/recipes/${id}`);
+      setTitle(data.title);
+      setDescription(data.description);
+      setIngredients(data.ingredients.join('\n'));
+      setSteps(data.steps.join('\n'));
     })();
-  }, [id, token]);
+  }, [id]);
 
-  const submit = async (e) => {
+  async function onSubmit(e) {
     e.preventDefault();
-    setError('');
-
     const fd = new FormData();
     fd.append('title', title);
     fd.append('description', description);
-    fd.append('ingredients', ingredients);
-    fd.append('steps', steps);
+    fd.append('ingredients', JSON.stringify(ingredients.split('\n').map(s => s.trim()).filter(Boolean)));
+    fd.append('steps', JSON.stringify(steps.split('\n').map(s => s.trim()).filter(Boolean)));
     if (image) fd.append('image', image);
-
-    try {
-      const { data } = await api.put(`/recipes/${id}`, fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        },
-      });
-      navigate('/recipe/' + data._id);
-    } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to update recipe');
-    }
-  };
+    await api.put(`/recipes/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    navigate('/');
+  }
 
   return (
-    <Box maxW="lg" mx="auto" bg="white" p={6} borderRadius="2xl" boxShadow="md">
-      <Heading mb={4}>Edit Recipe</Heading>
-      {error && <Alert status="error" mb={3}><AlertIcon />{error}</Alert>}
-      <form onSubmit={submit}>
-        <Stack spacing={3}>
+    <Box maxW="700px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="xl">
+      <Heading mb={4}>Update Recipe</Heading>
+      <form onSubmit={onSubmit}>
+        <VStack spacing={4} align="stretch">
           <FormControl isRequired>
             <FormLabel>Title</FormLabel>
             <Input value={title} onChange={e => setTitle(e.target.value)} />
@@ -78,11 +58,11 @@ export default function EditRecipe() {
             <Textarea value={steps} onChange={e => setSteps(e.target.value)} />
           </FormControl>
           <FormControl>
-            <FormLabel>Replace Image</FormLabel>
+            <FormLabel>Image</FormLabel>
             <Input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
           </FormControl>
-          <Button type="submit" colorScheme="yellow">Save</Button>
-        </Stack>
+          <Button type="submit" colorScheme="teal">Update</Button>
+        </VStack>
       </form>
     </Box>
   );

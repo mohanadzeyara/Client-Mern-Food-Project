@@ -3,9 +3,12 @@ import { motion } from 'framer-motion';
 import { Box, Heading, Text, Button, Image, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-export default function RecipeCard({ recipe, canEdit, onDelete }) {
-  const API_URL = "https://mern-project-server-ivsc.onrender.com" ||'http://localhost:5000';
+function getImageSrc(img) {
+  if (!img) return '';
+  return img;  // Cloudinary gives a full URL
+}
 
+export default function RecipeCard({ recipe, canEdit, onDelete }) {
   return (
     <Box
       as={motion.div}
@@ -20,7 +23,7 @@ export default function RecipeCard({ recipe, canEdit, onDelete }) {
     >
       {recipe.image && (
         <Image
-          src={`${API_URL}/images/${recipe.image}`}
+          src={getImageSrc(recipe.image)}
           alt={recipe.title}
           w="100%"
           h="200px"
